@@ -37,12 +37,12 @@ def plot_images(dataset, index, title = None):
     fig, ax = plt.subplots(1, figsize=(12, 9))
     ax.imshow(image.permute(1, 2, 0).cpu())
     ax.set_title(title)
-    ax.axis("off")
+    #ax.axis("off")
 
     boxes = dataset.get_plot_box(index)
     for i, box in enumerate(boxes):
         class_index = int(box[0])
-        class_name = classes[class_index]
+        class_name = dataset.classes[class_index]
         conf = box[5]
         
         cx, cy, w, h = box[1:5]
@@ -51,18 +51,19 @@ def plot_images(dataset, index, title = None):
         w *= width
         h *= height
         rect = patches.Rectangle(
-            (cx - w/2, cy - h/2), 
+            (cx - (w/2), cy - (h/2)), 
             w, h, 
             linewidth = 2, edgecolor = 'r', facecolor = 'none'
         )
         ax.add_patch(rect)
         
         ax.text(
-            cx - w/2 - 10, cy - h/2 - 10, 
+            cx - (w/2) - 10, cy - (h/2) - 10, 
             f"{class_name}: {conf:.2f}", 
             color = "white", fontsize = 10, backgroundcolor = "red"
         )
     plt.show()
+
 
 #%%
 from loader import YoloDataset
