@@ -1,3 +1,4 @@
+#%%
 import torch
 from torch import nn
 import torchvision.transforms as T
@@ -10,7 +11,7 @@ import torchvision.transforms as T
 from torchvision.models.segmentation import deeplabv3_resnet50, DeepLabV3_ResNet50_Weights
 from torchvision.models.segmentation.deeplabv3 import DeepLabHead, FCNHead
 
-from torchtune.datasets import ConcatDataset
+#from torchtune.datasets import ConcatDataset
 
 from sklearn.metrics import confusion_matrix
 
@@ -28,20 +29,27 @@ import glob
 
 classes = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 
-def plot_images(image, boxes, title = None):
-    _, height, width = img.shape
+def plot_images(dataset, index, title = None):
+    #TODO: ADICIONAR PREVISÃO DO MODELO NO PLOT
+    image = dataset.get_plot_image(index)
+    _, height, width = image.shape
 
     fig, ax = plt.subplots(1, figsize=(12, 9))
-    ax.imshow(img.permute(1, 2, 0).cpu())
+    ax.imshow(image.permute(1, 2, 0).cpu())
     ax.set_title(title)
     ax.axis("off")
 
+    boxes = dataset.get_plot_box(index)
     for i, box in enumerate(boxes):
-        cx, cy, w, h = box[2:6]
+        class_index = int(box[0])
+        class_name = classes[class_index]
+        conf = box[5]
         
-        class_name = class_names[class_index]
-        
-        x1, y1, x2, y2 = box[:4]
+        cx, cy, w, h = box[1:5]
+        cx *= width
+        cy *= height
+        w *= width
+        h *= height
         rect = patches.Rectangle(
             (cx - w/2, cy - h/2), 
             cx + w/2, cy + h/2, 
@@ -49,13 +57,19 @@ def plot_images(image, boxes, title = None):
         )
         ax.add_patch(rect)
         
-        # Add class and confidence
-        class_index = box[0]
-        class_name = classes[class_index]
-        conf = box[1]
         ax.text(
-            cx, cy - 5, 
+            cx - w/2 - 10, cy - h/2 - 10, 
             f"{class_name}: {conf:.2f}", 
             color = "white", fontsize = 10, backgroundcolor = "red"
         )
     plt.show()
+
+#%%
+from loader import YoloDataset
+dataset = YoloDataset("train", 5, ["/home/pedro/Modelos/Faculdade/DL/Assignment 2/yolo_dataset"])
+dataset.get_plot_box(4)
+
+# %%
+plot_images(dataset, 1000)
+
+# %%

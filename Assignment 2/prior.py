@@ -6,7 +6,7 @@ import os
 from glob import glob
 
 original_dataset_path = 'data/'
-yolo_dataset_path = 'yolo_dataset'
+yolo_dataset_path = '/home/pedro/Modelos/Faculdade/DL/Assignment 2/yolo_dataset'
 
 files = glob(os.path.join(original_dataset_path, "labels", "train", "*.txt"))
 
@@ -32,3 +32,5 @@ kmeans = KMeans(n_anchors)
 kmeans.fit(centers)
 
 print(kmeans.cluster_centers_)
+
+# %%
