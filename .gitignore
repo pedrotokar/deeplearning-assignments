@@ -1,0 +1,5 @@
+yolo_dataset/
+data/
+runs/
+Assignment 1/*.json
+Assignment 1/*.pth
