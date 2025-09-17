@@ -3,3 +3,8 @@ data/
 runs/
 Assignment 1/*.json
 Assignment 1/*.pth
+Assignment 1/CamVid/
+Aula Prática 1/
+Aula Prática 2/
+.ipynb_checkpoints
+__pycache__/

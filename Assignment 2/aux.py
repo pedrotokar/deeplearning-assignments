@@ -52,7 +52,7 @@ def plot_images(dataset, index, title = None):
         h *= height
         rect = patches.Rectangle(
             (cx - w/2, cy - h/2), 
-            cx + w/2, cy + h/2, 
+            w, h, 
             linewidth = 2, edgecolor = 'r', facecolor = 'none'
         )
         ax.add_patch(rect)
