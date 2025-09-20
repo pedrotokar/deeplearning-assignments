@@ -1,4 +1,5 @@
 yolo_dataset/
+unet_dataset/
 data/
 runs/
 Assignment 1/*.json
