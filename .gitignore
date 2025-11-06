@@ -1,13 +1,18 @@
 yolo_dataset/
 unet_dataset/
 mask_dataset/
-data/
-runs/
-Assignment 1/*.json
-Assignment 1/*.pth
+
 Assignment 1/CamVid/
 Aula Prática */
+
+data/
+runs/
+
+*.json
+*.pth
+
 .ipynb_checkpoints
 __pycache__/
+
 Assignment 1/Deep_Learning_Assignment_1 1.ipynb
 Assignment 1/Deep_Learning_Assignment_1 2.ipynb
