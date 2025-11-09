@@ -6,7 +6,7 @@ import torchvision.transforms.functional as TF
 
 class CTAugment:
     def __init__(self, n_bins=17, alpha=1e-2, init_w=1.0):
-
+        
         self._AUGMENTATION_SPACE = {
             "AutoContrast": (lambda n, h, w: None, False),
             "Brightness": (lambda n, h, w: np.linspace(0.0, 1.0, n), True),
@@ -268,3 +268,7 @@ class CTAugment:
 
     def get_weights_dict(self):
         return {self._op_names[i]: self.weights[i].copy() for i in range(self._n_ops)}
+
+
+if __name__ == "__main__":
+    augment = CTAugment()
