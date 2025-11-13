@@ -57,7 +57,7 @@ class CTAugment:
         # se arr for escalar (0-d), devolve o valor escalar
         if arr.ndim == 0:
             return float(arr)
-
+        
         n = arr.shape[0]
         if n == 0:
             return None
@@ -88,11 +88,14 @@ class CTAugment:
 
         if name == "Contrast":
             return TF.adjust_contrast(img, float(mag))
-
+        
         if name == "Equalize":
             blend = 1.0 if mag is None else float(mag)
-
-            img_u8 = (img * 255.0).round().clamp(0, 255).to(torch.uint8)
+            
+            if torch.max(img) > 1:
+                img_u8 = img.clamp(0, 255).to(torch.uint8)
+            else:
+                img_u8 = (img * 255.0).round().clamp(0, 255).to(torch.uint8)
 
             eq_u8 = torch.empty_like(img_u8, dtype=torch.uint8, device=device)
             num_pixels = H * W
@@ -119,39 +122,13 @@ class CTAugment:
 
             # volta para float 0-1 e blend com a imagem original
             eq_f = eq_u8.to(torch.float32) / 255.0
-            out = img * (1.0 - blend) + eq_f * blend
-            return out
+            return eq_f * blend
 
         if name == "Identity":
-            if mag is None:
-                return img
-            
-            frac = float(mag)
-
-            if frac <= 0.0:
-                return img
-
-            if frac <= 1.0:
-                crop_h = max(1, int(round(frac * H)))
-                crop_w = max(1, int(round(frac * W)))
-                top = (H - crop_h) // 2
-                left = (W - crop_w) // 2
-                cropped = img[:, top:top + crop_h, left:left + crop_w]
-                out = F.interpolate(cropped.unsqueeze(0), size=(H, W), mode="bilinear", align_corners=False).squeeze(0)
-                return out
-
-            new_h = max(1, int(round(frac * H)))
-            new_w = max(1, int(round(frac * W)))
-            scaled = F.interpolate(img.unsqueeze(0), size=(new_h, new_w), mode="bilinear", align_corners=False).squeeze(0)
-            top = max(0, (new_h - H) // 2)
-            left = max(0, (new_w - W) // 2)
-            return scaled[:, top:top + H, left:left + W]
+            return img
         
         if name == "Invert":
-            inv = 1.0 - img
-            if mag is None:
-                return inv
-            return img * (1.0 - float(mag)) + inv * float(mag)
+            return TF.invert(img)
 
         if name == "Posterize":
             bits = int(round(mag)) if mag is not None else 4
@@ -190,9 +167,9 @@ class CTAugment:
             return TF.affine(img, angle=0.0, translate=(0, 0), scale=1.0, shear=(0.0, shear_deg), interpolation=TF.InterpolationMode.BILINEAR, fill=128)
 
         if name == "Solarize":
-            thr = int(round(mag)) if mag is not None else 128
+            thr = int(mag) if mag is not None else 128
             thr = max(0, min(thr, 255))
-            
+
             img_u8 = (img * 255.0).round().clamp(0, 255).to(torch.uint8)
             out_u8 = TF.solarize(img_u8, thr)
             out = out_u8.to(torch.float32) / 255.0
@@ -206,11 +183,11 @@ class CTAugment:
             return TF.gaussian_blur(img, kernel_size=[k, k], sigma=(radius, radius))
 
         if name == "TranslateX":
-            tx = int(round(float(mag)))
+            tx = round(float(mag))
             return TF.affine(img, angle=0.0, translate=(tx, 0), scale=1.0, shear=0.0, interpolation=TF.InterpolationMode.BILINEAR, fill=128)
 
         if name == "TranslateY":
-            ty = int(round(float(mag)))
+            ty = round(float(mag))
             return TF.affine(img, angle=0.0, translate=(0, ty), scale=1.0, shear=0.0, interpolation=TF.InterpolationMode.BILINEAR, fill=128)
 
         return img
